@@ -6,7 +6,9 @@ const PORT = process.env.PORT || 8000
 
 async function init() {
     try {
-        await mongoose.connect(process.env.MONGODB_URI)
+        await mongoose.connect(
+            `mongodb+srv://sujitsamaldev:UAM8ooBVvtQEfl9F@cluster0.wecbn.mongodb.net/moviebooking?retryWrites=true&w=majority&appName=Cluster0`
+        )
         console.log(`MongoDB connected`)
 
         const server = http.createServer(expressServer)

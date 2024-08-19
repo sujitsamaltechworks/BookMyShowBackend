@@ -1,0 +1,74 @@
+const AppError = require('../errors/app.error')
+const {
+    userSignupValidationSchema,
+    userSigninValidationSchema,
+} = require('../lib/validators/auth.validators')
+const AuthService = require('../services/auth.service')
+
+async function handleSignup(req, res) {
+    const validationResult = await userSignupValidationSchema.safeParseAsync(
+        req.body
+    )
+
+    if (validationResult.error)
+        return res.status(400).json({ error: validationResult.error })
+
+    const { firstname, lastname, email, password } = validationResult.data
+
+    try {
+        const token = await AuthService.signupWithEmailAndPassword({
+            firstname,
+            lastname,
+            email,
+            password,
+        })
+
+        res.status(201).json({ status: 'Success', data: { token } })
+    } catch (err) {
+        if (err instanceof AppError)
+            res.status(err.code).json({
+                status: 'Error',
+                message: err.message,
+            })
+
+        console.log('Error', err)
+        res.status(500).json({
+            status: 'Error',
+            message: 'Internal Server Error',
+        })
+    }
+}
+
+async function handleSignin(req, res) {
+    const validationResult = await userSigninValidationSchema.safeParseAsync(
+        req.body
+    )
+
+    if (validationResult.error)
+        return res.status(400).json({ error: validationResult.error })
+
+    const { email, password } = validationResult.data
+
+    try {
+        const token = await AuthService.signinWithEmailAndPassword({
+            email,
+            password,
+        })
+        return res.status(201).json({ status: 'success', data: { token } })
+    } catch (err) {
+        if (err instanceof AppError)
+            return res
+                .status(err.code)
+                .json({ status: 'error', error: err.message })
+
+        console.log(`Error`, err)
+        return res
+            .status(500)
+            .json({ status: 'error', error: 'Internal Server Error' })
+    }
+}
+
+module.exports = {
+    handleSignup,
+    handleSignin,
+}
