@@ -1,5 +1,6 @@
 const {
     createTheatreValidationSchema,
+    createTheatreHallSchema,
 } = require('../lib/validators/theatre.validator')
 const Theatre = require('../models/theatre.model')
 const TheatreService = require('../services/theatre.service')
@@ -50,8 +51,30 @@ async function getTheatreById(req, res) {
     return res.status(200).json({ status: 'Success', data: theatre })
 }
 
+// Controller for halls
+async function getTheatreHallsByTheatreId(req, res) {
+    const theatreId = req.params.theatreId
+    const halls = await TheatreService.getHallsByTheatreId(theatreId)
+    return res.json({ status: 'success', data: halls })
+}
+
+async function createTheatreHall(req, res) {
+    const validationResult = await createTheatreHallSchema.safeParseAsync(
+        req.body
+    )
+
+    if (validationResult.error)
+        return res.status(400).json({ error: validationResult.error })
+
+    const hall = await TheatreService.createTheatreHall(validationResult.data)
+
+    return res.json({ status: 'success', data: hall })
+}
+
 module.exports = {
     getAllTheatres,
     createTheatre,
     getTheatreById,
+    getTheatreHallsByTheatreId,
+    createTheatreHall,
 }

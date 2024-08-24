@@ -16,8 +16,11 @@ router.delete('/theatres')
 router.delete('/theatres/:id')
 
 // threatre_halls
-router.get('/theatres/:theatreId/halls')
-router.post('/theatres/:theatreId/halls')
+router.get(
+    '/theatres/:theatreId/halls',
+    theatreController.getTheatreHallsByTheatreId
+)
+router.post('/theatres/:theatreId/halls', theatreController.createTheatreHall)
 
 // movies
 router.get('/movies', movieController.getAllMovies)
